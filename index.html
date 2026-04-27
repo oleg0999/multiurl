@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <link rel="icon" type="image/png" href="simple.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Мультиссылки | Динамическая активность</title>
+    <title> DakovvDen </title>
     <!-- Discord RPC (через Lanyard) -->
     <script src="https://cdn.jsdelivr.net/npm/lanyard.js@latest/dist/lanyard.min.js"></script>
     <style>
@@ -14,14 +15,40 @@
             user-select: none;
         }
 
+        /* Видеофон */
+        #bg-video {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -2;
+            object-fit: cover;
+            opacity: 0.5;
+        }
+
+        /* Затемняющий слой поверх видео */
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 15, 30, 0.75);
+            z-index: -1;
+        }
+
         body {
-            background: radial-gradient(circle at 20% 30%, #0a0f1e, #03060c);
+            background: transparent;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 1.5rem;
+            margin: 0;
         }
 
         .profile-card {
@@ -225,6 +252,13 @@
 </head>
 <body>
 
+<!-- Видеофон -->
+<video autoplay muted loop id="bg-video">
+    <source src="background.mp4" type="video/mp4">
+    Ваш браузер не поддерживает видео.
+</video>
+<div class="video-overlay"></div>
+
 <div class="profile-card">
     <div class="avatar-section">
         <div class="avatar-ring">
@@ -270,7 +304,7 @@
             <span class="arrow-icon">↗</span>
         </a>
 
-        <a href="https://instagram.com/dakovv" target="_blank" rel="noopener noreferrer" class="link-btn">
+        <a href="https://www.youtube.com/@Dakovvv-v2m" target="_blank" rel="noopener noreferrer" class="link-btn">
             <div class="btn-left">
                 <span class="btn-icon">📸</span>
                 <span>YouTube</span>
