@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Мультиссылки | Профиль</title>
-    <!-- Discord RPC (через Lanyard) - красивый статус с использованием API -->
+    <title>Мультиссылки | Динамическая активность</title>
+    <!-- Discord RPC (через Lanyard) -->
     <script src="https://cdn.jsdelivr.net/npm/lanyard.js@latest/dist/lanyard.min.js"></script>
     <style>
         * {
@@ -24,7 +24,6 @@
             padding: 1.5rem;
         }
 
-        /* главный карточный контейнер */
         .profile-card {
             max-width: 520px;
             width: 100%;
@@ -37,7 +36,6 @@
             border: 1px solid rgba(96, 165, 250, 0.25);
         }
 
-        /* шапка: аватар + ник */
         .avatar-section {
             display: flex;
             flex-direction: column;
@@ -86,7 +84,6 @@
             backdrop-filter: blur(4px);
         }
 
-        /* RPC блок */
         .discord-rpc {
             background: rgba(0, 0, 0, 0.4);
             margin: 1.5rem 0 1.8rem;
@@ -140,7 +137,6 @@
             box-shadow: 0 0 4px #23a55a;
         }
 
-        /* кнопки мультиссылок */
         .links-grid {
             display: flex;
             flex-direction: column;
@@ -187,14 +183,26 @@
             opacity: 0.7;
         }
 
-        /* футер / цитата */
-        .quote-footer {
+        .activity-footer {
             text-align: center;
             margin-top: 1.2rem;
-            font-size: 0.75rem;
-            color: #6c7aa8;
             border-top: 1px dashed #2a345a;
             padding-top: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 1rem;
+            padding: 0.8rem;
+        }
+
+        .activity-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #b9c8ff;
+            margin-bottom: 4px;
+        }
+
+        .activity-details {
+            font-size: 0.7rem;
+            color: #6c7aa8;
         }
 
         @media (max-width: 480px) {
@@ -206,7 +214,6 @@
             }
         }
 
-        /* индикатор загрузки RPC */
         .loading-rpc {
             color: #b9c4e3;
             font-size: 0.8rem;
@@ -219,30 +226,27 @@
 <body>
 
 <div class="profile-card">
-    <!-- аватар и имя -->
     <div class="avatar-section">
         <div class="avatar-ring">
             <img class="avatar" id="userAvatar" src="https://cdn.discordapp.com/avatars/489975528464449536/a_avatar_placeholder.png?size=160" alt="avatar">
         </div>
         <h1>dakovv</h1>
         <div class="badge">
-            <span>✧</span> мультиссылки <span>✧</span>
+            <span>✧</span> ♥Цавт танем♥ <span>✧</span>
         </div>
         <div class="badge" style="background:#00000066; margin-top: 5px;">
             📍 Russia, Stavropol
         </div>
     </div>
 
-    <!-- Discord RPC статус (через Lanyard API) с пользователем 489975528464449536 -->
     <div class="discord-rpc" id="rpcContainer">
         <div class="loading-rpc">
             <div class="green-dot"></div> Discord RPC — загрузка статуса...
         </div>
     </div>
 
-    <!-- 4 кнопки с мультиссылками (пример реальных соцсетей, можно заменить) -->
     <div class="links-grid">
-        <a href="https://t.me/dakovv" target="_blank" rel="noopener noreferrer" class="link-btn">
+        <a href="https://t.me/DakovvDen" target="_blank" rel="noopener noreferrer" class="link-btn">
             <div class="btn-left">
                 <span class="btn-icon">📱</span>
                 <span>Telegram</span>
@@ -250,7 +254,7 @@
             <span class="arrow-icon">↗</span>
         </a>
 
-        <a href="https://github.com/dakovv" target="_blank" rel="noopener noreferrer" class="link-btn">
+        <a href="https://github.com/oleg0999" target="_blank" rel="noopener noreferrer" class="link-btn">
             <div class="btn-left">
                 <span class="btn-icon">🐙</span>
                 <span>GitHub</span>
@@ -258,10 +262,10 @@
             <span class="arrow-icon">↗</span>
         </a>
 
-        <a href="https://discord.gg/invite/dakovv" target="_blank" rel="noopener noreferrer" class="link-btn">
+        <a href="https://steamcommunity.com/id/ArmKitsun/" target="_blank" rel="noopener noreferrer" class="link-btn">
             <div class="btn-left">
                 <span class="btn-icon">🎮</span>
-                <span>Discord Сервер</span>
+                <span>Steam</span>
             </div>
             <span class="arrow-icon">↗</span>
         </a>
@@ -269,71 +273,97 @@
         <a href="https://instagram.com/dakovv" target="_blank" rel="noopener noreferrer" class="link-btn">
             <div class="btn-left">
                 <span class="btn-icon">📸</span>
-                <span>Instagram</span>
+                <span>YouTube</span>
             </div>
             <span class="arrow-icon">↗</span>
         </a>
     </div>
 
-    <div class="quote-footer">
-        😭 "Типичная пацанская цитата"<br>
-        <span style="font-size: 0.7rem;">UID 660,484 · Profile Views: 14.2K · HypeSquad Balance</span>
+    <!-- Динамический футер с активностью вместо статичной цитаты -->
+    <div class="activity-footer" id="dynamicActivity">
+        <div class="activity-name" id="activityName">🔄 Загрузка активности...</div>
+        <div class="activity-details" id="activityDetails"></div>
     </div>
 </div>
 
 <script>
-    // Discord User ID (который вы указали)
     const DISCORD_USER_ID = "489975528464449536";
-    // CDN аватара по умолчанию, если не подгрузится
     const defaultAvatarUrl = "https://cdn.discordapp.com/embed/avatars/0.png";
 
-    // Функция для обновления RPC через Lanyard API (официальный WebSocket)
-    // Lanyard отслеживает Rich Presence пользователя через Discord Gateway (требуется, чтобы пользователь был в голосовом канале/имел активность)
-    // Если у пользователя нет активного RP, покажем "не в игре / оффлайн статус"
-    
     let socket = null;
     let reconnectTimeout = null;
+
+    // Функция для обновления активности в футере
+    function updateFooterActivity(data) {
+        const activities = data?.activities || [];
+        const activityNameElem = document.getElementById('activityName');
+        const activityDetailsElem = document.getElementById('activityDetails');
+        
+        if (!activityNameElem) return;
+        
+        if (activities.length > 0) {
+            const primaryActivity = activities[0];
+            const activityName = primaryActivity.name || '';
+            const activityDetails = primaryActivity.details || '';
+            const activityState = primaryActivity.state || '';
+            const activityType = primaryActivity.type; // 0 = игра, 2 = слушает, 3 = смотрит и т.д.
+            
+            // Определяем иконку в зависимости от типа активности
+            let icon = "🎮";
+            if (activityType === 2) icon = "🎵";
+            else if (activityType === 3) icon = "📺";
+            else if (activityType === 1) icon = "🎨";
+            
+            // Формируем текст активности
+            if (activityName && activityDetails) {
+                activityNameElem.innerHTML = `${icon} ${activityName}`;
+                activityDetailsElem.innerHTML = `${activityDetails} ${activityState ? '· ' + activityState : ''}`;
+            } else if (activityName) {
+                activityNameElem.innerHTML = `${icon} Сейчас: ${activityName}`;
+                activityDetailsElem.innerHTML = activityState || 'Активен в Discord';
+            } else {
+                activityNameElem.innerHTML = `💤 Не активен`;
+                activityDetailsElem.innerHTML = `Нет запущенных игр или приложений`;
+            }
+        } else {
+            activityNameElem.innerHTML = `💤 Не активен`;
+            activityDetailsElem.innerHTML = `Нет запущенных игр или приложений`;
+        }
+    }
 
     function updateRPCUI(data) {
         const container = document.getElementById('rpcContainer');
         if (!container) return;
 
-        // Если данные присутствуют и есть активность (activities)
         const activities = data?.activities || [];
-        const discordStatus = data?.discord_status || 'offline'; // online, idle, dnd, offline
+        const discordStatus = data?.discord_status || 'offline';
         
-        let statusText = '';
         let statusColor = '';
+        let statusText = '';
         switch(discordStatus) {
             case 'online': statusColor = '#23a55a'; statusText = 'В сети'; break;
             case 'idle': statusColor = '#faa81a'; statusText = 'Не активен'; break;
             case 'dnd': statusColor = '#ed4245'; statusText = 'Не беспокоить'; break;
-            default: statusColor = '#747f8d'; statusText = 'Не в сети / оффлайн';
+            default: statusColor = '#747f8d'; statusText = 'Не в сети';
         }
 
-        // Основная активность (игра / RPC)
         let primaryActivity = null;
         if (activities.length > 0) {
-            // Фильтруем custom status? но покажем самую первую игру или кастомную
             primaryActivity = activities[0];
         }
 
-        // Если есть Rich Presence (например, слушает Spotify, играет в игру с деталями)
         let rpcName = '';
         let rpcDetails = '';
         let rpcState = '';
         let largeImageText = '';
-        let smallImageText = '';
 
         if (primaryActivity) {
             rpcName = primaryActivity.name || '';
             rpcDetails = primaryActivity.details || '';
             rpcState = primaryActivity.state || '';
             largeImageText = primaryActivity.assets?.large_text || '';
-            smallImageText = primaryActivity.assets?.small_text || '';
         }
 
-        // Сборка HTML
         let rpcHtml = `
             <div class="rpc-status">
                 <img class="rpc-avatar" id="dynamicAvatar" src="${defaultAvatarUrl}" alt="avatar">
@@ -354,23 +384,22 @@
             rpcHtml += `<div class="rpc-detail">💤 Без активности / не играет</div>`;
         }
 
-        // время последнего обновления
         rpcHtml += `<div class="rpc-detail" style="margin-top: 6px; font-size:0.7rem;">✨ Discord RPC в реальном времени</div>`;
         rpcHtml += `</div></div>`;
 
         container.innerHTML = rpcHtml;
 
-        // Обновляем аватар пользователя через API lanyard (data.discord_user.avatar)
+        // Обновляем футер с активностью
+        updateFooterActivity(data);
+
         if (data?.discord_user?.avatar) {
             const avatarHash = data.discord_user.avatar;
             const avatarUrl = `https://cdn.discordapp.com/avatars/${DISCORD_USER_ID}/${avatarHash}.png?size=80`;
             const avatarImg = document.getElementById('dynamicAvatar');
             if (avatarImg) avatarImg.src = avatarUrl;
-            // также обновим главный аватар (в шапке)
             const mainAvatar = document.querySelector('.avatar');
             if (mainAvatar) mainAvatar.src = avatarUrl;
         } else {
-            // фолбэк аватар - через id, попробуем стандартный
             const fallbackAvatar = `https://cdn.discordapp.com/avatars/${DISCORD_USER_ID}/${data?.discord_user?.avatar || '0'}.png?size=80`;
             const avatarImg = document.getElementById('dynamicAvatar');
             if (avatarImg) avatarImg.src = fallbackAvatar;
@@ -378,7 +407,6 @@
             if (mainAvatar && data?.discord_user?.avatar === undefined) mainAvatar.src = `https://cdn.discordapp.com/avatars/${DISCORD_USER_ID}/0.png`;
         }
 
-        // также обновить имя, если отличаеся (опционально)
         if(data?.discord_user?.global_name) {
             const nameHeader = document.querySelector('h1');
             if(nameHeader && nameHeader.innerText !== data.discord_user.global_name) {
@@ -394,23 +422,25 @@
             <div class="rpc-status">
                 <div class="rpc-text">
                     <div class="rpc-line">🎵 Discord RPC не загружен</div>
-                    <div class="rpc-detail">Пользователь ${DISCORD_USER_ID} возможно оффлайн или скрыт. Статус не отображается.</div>
-                    <div class="rpc-detail" style="font-size:0.7rem;">⚡ Используйте Lanyard API — демо-режим</div>
+                    <div class="rpc-detail">Пользователь ${DISCORD_USER_ID} возможно оффлайн или скрыт.</div>
+                    <div class="rpc-detail" style="font-size:0.7rem;">⚡ Lanyard API — демо-режим</div>
                 </div>
             </div>
         `;
+        const activityNameElem = document.getElementById('activityName');
+        if(activityNameElem) {
+            activityNameElem.innerHTML = `⚠️ Не удалось загрузить активность`;
+            document.getElementById('activityDetails').innerHTML = `Проверьте ID пользователя или подключение`;
+        }
     }
 
-    // Инициализация Lanyard WebSocket соединения
     function initLanyard() {
         if (socket && socket.readyState === WebSocket.OPEN) {
             socket.close();
         }
-        // Lanyard public WebSocket: wss://api.lanyard.rest/socket
         const ws = new WebSocket("wss://api.lanyard.rest/socket");
         
         ws.addEventListener("open", () => {
-            // Отправляем subscribe на конкретного пользователя
             ws.send(JSON.stringify({
                 op: 2,
                 d: {
@@ -423,18 +453,13 @@
             try {
                 const packet = JSON.parse(event.data);
                 if (packet.op === 1) {
-                    // Heartbeat требуется (Lanyard keepalive)
                     if (ws.readyState === WebSocket.OPEN) {
                         ws.send(JSON.stringify({ op: 1 }));
                     }
                 }
-                if (packet.op === 0 && packet.t === "INIT_STATE" || packet.t === "PRESENCE_UPDATE") {
+                if (packet.op === 0 && (packet.t === "INIT_STATE" || packet.t === "PRESENCE_UPDATE")) {
                     const userData = packet.d;
                     if (userData && (userData.discord_user?.id === DISCORD_USER_ID || userData.user_id === DISCORD_USER_ID)) {
-                        updateRPCUI(userData);
-                    } else if (userData && userData.user_id === DISCORD_USER_ID) {
-                        updateRPCUI(userData);
-                    } else if (userData && userData.discord_user?.id === DISCORD_USER_ID) {
                         updateRPCUI(userData);
                     }
                 }
@@ -447,7 +472,6 @@
         });
         
         ws.addEventListener("close", () => {
-            // переподключение через 5 секунд
             if (reconnectTimeout) clearTimeout(reconnectTimeout);
             reconnectTimeout = setTimeout(() => initLanyard(), 5000);
         });
@@ -455,7 +479,6 @@
         socket = ws;
     }
     
-    // Безопасное экранирование HTML
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/[&<>]/g, function(m) {
@@ -463,12 +486,9 @@
             if (m === '<') return '&lt;';
             if (m === '>') return '&gt;';
             return m;
-        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-            return c;
         });
     }
 
-    // Также попробуем предзагрузить аватар через fallback REST API, чтобы сразу показать что-то красивое
     async function fetchInitialAvatarAndStatus() {
         try {
             const restRes = await fetch(`https://api.lanyard.rest/v1/users/${DISCORD_USER_ID}`);
@@ -477,23 +497,18 @@
                 if (json.success && json.data) {
                     updateRPCUI(json.data);
                 } else {
-                    // минимальный фолбэк аватарки
                     const avatarUrl = `https://cdn.discordapp.com/avatars/${DISCORD_USER_ID}/0.png?size=120`;
                     document.querySelector('.avatar')?.setAttribute('src', avatarUrl);
                 }
-            } else {
-                console.log("REST API fallback не удался");
             }
         } catch(e) {
             console.log("Не удалось загрузить данные по REST");
         }
     }
     
-    // Запускаем
     fetchInitialAvatarAndStatus();
     initLanyard();
 
-    // Дополнительно: обновляем имя пользователя в RPC каждые 30 секунд через REST (на всякий)
     setInterval(() => {
         if (!socket || socket.readyState !== WebSocket.OPEN) {
             fetchInitialAvatarAndStatus();
