@@ -2,6 +2,8 @@
 <html lang="ru">
 <head>
     <link rel="icon" type="image/png" href="simple.png">
+    <link rel="shortcut icon" type="image/png" href="simple.png">
+    <link rel="apple-touch-icon" type="image/png" href="simple.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title> DakovvDen </title>
@@ -54,11 +56,11 @@
         .profile-card {
             max-width: 520px;
             width: 100%;
-            background: rgba(18, 25, 45, 0.65);
+            background: rgba(18, 25, 45, 0.5); /* 50% прозрачности */
             backdrop-filter: blur(12px);
             border-radius: 3rem;
             padding: 2rem 1.8rem 2.2rem;
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.171), 0 0 0 1px rgba(66, 153, 225, 0.2);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(66, 153, 225, 0.2);
             transition: all 0.2s ease;
             border: 1px solid rgba(96, 165, 250, 0.25);
         }
@@ -133,6 +135,15 @@
             border-radius: 50%;
             background: #2e3440;
             border: 2px solid #5865F2;
+        }
+
+        /* Стили для картинки активности */
+        .activity-image {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #2e3440;
+            object-fit: cover;
         }
 
         .rpc-text {
@@ -340,15 +351,13 @@
             const activityName = primaryActivity.name || '';
             const activityDetails = primaryActivity.details || '';
             const activityState = primaryActivity.state || '';
-            const activityType = primaryActivity.type; // 0 = игра, 2 = слушает, 3 = смотрит и т.д.
+            const activityType = primaryActivity.type;
             
-            // Определяем иконку в зависимости от типа активности
             let icon = "🎮";
             if (activityType === 2) icon = "🎵";
             else if (activityType === 3) icon = "📺";
             else if (activityType === 1) icon = "🎨";
             
-            // Формируем текст активности
             if (activityName && activityDetails) {
                 activityNameElem.innerHTML = `${icon} ${activityName}`;
                 activityDetailsElem.innerHTML = `${activityDetails} ${activityState ? '· ' + activityState : ''}`;
@@ -363,6 +372,27 @@
             activityNameElem.innerHTML = `💤 Не активен`;
             activityDetailsElem.innerHTML = `Нет запущенных игр или приложений`;
         }
+    }
+
+    // Функция для получения картинки активности
+    function getActivityImage(activity) {
+        if (!activity) return null;
+        
+        // Для Spotify
+        if (activity.name === "Spotify" && activity.assets?.large_image) {
+            return `https://i.scdn.co/image/${activity.assets.large_image.replace('spotify:', '')}`;
+        }
+        // Для других игр/приложений
+        if (activity.assets?.large_image) {
+            if (activity.assets.large_image.startsWith('mp:external/')) {
+                const externalId = activity.assets.large_image.replace('mp:external/', '');
+                return `https://media.discordapp.net/external/${externalId}`;
+            }
+            if (activity.application_id) {
+                return `https://cdn.discordapp.com/app-assets/${activity.application_id}/${activity.assets.large_image}.png`;
+            }
+        }
+        return null;
     }
 
     function updateRPCUI(data) {
@@ -390,12 +420,14 @@
         let rpcDetails = '';
         let rpcState = '';
         let largeImageText = '';
+        let activityImageUrl = null;
 
         if (primaryActivity) {
             rpcName = primaryActivity.name || '';
             rpcDetails = primaryActivity.details || '';
             rpcState = primaryActivity.state || '';
             largeImageText = primaryActivity.assets?.large_text || '';
+            activityImageUrl = getActivityImage(primaryActivity);
         }
 
         let rpcHtml = `
@@ -409,7 +441,16 @@
         `;
 
         if (primaryActivity) {
-            rpcHtml += `<div class="rpc-detail">🎮 <strong>${escapeHtml(rpcName)}</strong>`;
+            rpcHtml += `<div class="rpc-detail">`;
+            
+            // Показываем картинку активности если она есть
+            if (activityImageUrl) {
+                rpcHtml += `<img class="activity-image" src="${activityImageUrl}" alt="activity image" style="width: 32px; height: 32px; border-radius: 8px;">`;
+            } else {
+                rpcHtml += `<span>🎮</span>`;
+            }
+            
+            rpcHtml += `<strong>${escapeHtml(rpcName)}</strong>`;
             if (rpcDetails) rpcHtml += ` &nbsp;• ${escapeHtml(rpcDetails)}`;
             if (rpcState) rpcHtml += ` &nbsp;— ${escapeHtml(rpcState)}`;
             if (largeImageText) rpcHtml += `<span style="margin-left: 8px;">🖼️ ${escapeHtml(largeImageText)}</span>`;
